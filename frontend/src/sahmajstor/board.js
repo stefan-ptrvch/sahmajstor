@@ -4,6 +4,7 @@ import P5 from 'p5'
 const sketch = s => {
 
   function Square(x, y, fill) {
+    // One square, which can hold one of the available figures
 
     // Size of square
     let squareSize = 60
@@ -34,7 +35,7 @@ const sketch = s => {
     }
 
     // Returns whether this particular square was clicked or not
-    this.getMoves = function() {
+    this.wasClicked = function() {
       let d = s.dist(s.mouseX, s.mouseY, this.x + squareSize/2, this.y +
         squareSize/2)
       if (d < squareSize/2) {
@@ -86,7 +87,11 @@ const sketch = s => {
 
   s.mousePressed = () => {
     for (let square of squares) {
-      square.getMoves()
+      if (square.wasClicked()) {
+        square.updateColor('active')
+      } else {
+        square.updateColor('inactive')
+      }
     }
   }
 
