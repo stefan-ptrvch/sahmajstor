@@ -6,7 +6,8 @@ import {
   knightMoves,
   bishopMoves,
   queenMoves,
-  rookMoves
+  rookMoves,
+  kingMoves
 } from './figures.js'
 
 // These are board props
@@ -39,6 +40,7 @@ const sketch = s => {
         this.moves = queenMoves
       } else if (type === 'king') {
         this.image = s.loadImage(figureImagePath.kingWhiteImagePath)
+        this.moves = kingMoves
       }
     } else if (player === 'black') {
       if (type === 'pawn') {
@@ -58,6 +60,7 @@ const sketch = s => {
         this.moves = queenMoves
       } else if (type === 'king') {
         this.image = s.loadImage(figureImagePath.kingBlackImagePath)
+        this.moves = kingMoves
       }
     }
   }
