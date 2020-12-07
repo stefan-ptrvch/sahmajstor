@@ -129,6 +129,42 @@ export function bishopMoves(x, y, player) {
   return moves
 }
 
+export function rookMoves(x, y, player) {
+  console.log(player)
+  let newX, newY
+  let moves = []
+
+  newX = x
+  newY = y
+  while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+    moves.push({x: newX, y: newY})
+    newX += 1
+  }
+
+  newX = x
+  newY = y
+  while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+    moves.push({x: newX, y: newY})
+    newX -= 1
+  }
+
+  newX = x
+  newY = y
+  while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+    moves.push({x: newX, y: newY})
+    newY += 1
+  }
+
+  newX = x
+  newY = y
+  while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+    moves.push({x: newX, y: newY})
+    newY -= 1
+  }
+
+  return moves
+}
+
 export function queenMoves(x, y, player) {
   console.log(player)
   let newX, newY
