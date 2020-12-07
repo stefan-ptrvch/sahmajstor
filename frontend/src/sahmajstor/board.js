@@ -4,7 +4,8 @@ import {
   figureImagePath,
   pawnMoves,
   knightMoves,
-  bishopMoves
+  bishopMoves,
+  queenMoves
 } from './figures.js'
 
 // These are board props
@@ -33,6 +34,7 @@ const sketch = s => {
         this.image = s.loadImage(figureImagePath.rookWhiteImagePath)
       } else if (type === 'queen') {
         this.image = s.loadImage(figureImagePath.queenWhiteImagePath)
+        this.moves = queenMoves
       } else if (type === 'king') {
         this.image = s.loadImage(figureImagePath.kingWhiteImagePath)
       }
@@ -50,6 +52,7 @@ const sketch = s => {
         this.image = s.loadImage(figureImagePath.rookBlackImagePath)
       } else if (type === 'queen') {
         this.image = s.loadImage(figureImagePath.queenBlackImagePath)
+        this.moves = queenMoves
       } else if (type === 'king') {
         this.image = s.loadImage(figureImagePath.kingBlackImagePath)
       }
