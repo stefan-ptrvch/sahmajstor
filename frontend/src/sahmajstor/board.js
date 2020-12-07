@@ -1,22 +1,34 @@
 import P5 from 'p5'
-import { figureImagePath } from './figures.js'
 
+import {
+  figureImagePath,
+  pawnMoves,
+  knightMoves,
+  bishopMoves
+} from './figures.js'
+
+// These are board props
+export let squareSize = 70
+export let ROWS = 8
+export let COLS = 8
 
 const sketch = s => {
-
-  let squareSize = 70
-  let ROWS = 8
-  let COLS = 8
-
   function Figure(type, player) {
-    // Load the associated image for this figure
+    // Save which type of figure and which player it is
+    this.type = type
+    this.player = player
+
+    // Load image and moveset for this particular figure
     if (player === 'white') {
       if (type === 'pawn') {
         this.image = s.loadImage(figureImagePath.pawnWhiteImagePath)
+        this.moves = pawnMoves
       } else if (type === 'knight') {
         this.image = s.loadImage(figureImagePath.knightWhiteImagePath)
+        this.moves = knightMoves
       } else if (type === 'bishop') {
         this.image = s.loadImage(figureImagePath.bishopWhiteImagePath)
+        this.moves = bishopMoves
       } else if (type === 'rook') {
         this.image = s.loadImage(figureImagePath.rookWhiteImagePath)
       } else if (type === 'queen') {
@@ -27,10 +39,13 @@ const sketch = s => {
     } else if (player === 'black') {
       if (type === 'pawn') {
         this.image = s.loadImage(figureImagePath.pawnBlackImagePath)
+        this.moves = pawnMoves
       } else if (type === 'knight') {
         this.image = s.loadImage(figureImagePath.knightBlackImagePath)
+        this.moves = knightMoves
       } else if (type === 'bishop') {
         this.image = s.loadImage(figureImagePath.bishopBlackImagePath)
+        this.moves = bishopMoves
       } else if (type === 'rook') {
         this.image = s.loadImage(figureImagePath.rookBlackImagePath)
       } else if (type === 'queen') {
@@ -59,7 +74,6 @@ const sketch = s => {
 
     // Figure associated with this square
     this.figure = figure
-    console.log(figure)
 
     // Used to update display of this particular square
     this.display = function() {
@@ -74,7 +88,8 @@ const sketch = s => {
     // move to
     this.getMoves = function() {
       if (this.figure) {
-        return true
+        return this.figure.moves(this.squareX, this.squareY,
+          this.figure.player)
       } else {
         return null
       }
@@ -102,6 +117,7 @@ const sketch = s => {
   }
 
   let squares = []
+  let squaresXY = []
 
   s.setup = () => {
     s.createCanvas(squareSize*ROWS, squareSize*COLS)
@@ -111,6 +127,7 @@ const sketch = s => {
     let fill = 225
     let figure
     for (let row = 0; row < ROWS; row += 1) {
+      squaresXY.push([])
       for (let col = 0; col < COLS; col += 1) {
         if (currentIsWhite) {
           fill = s.color(181, 136, 99)
@@ -161,6 +178,7 @@ const sketch = s => {
         let square = new Square(col, row, fill, figure)
         square.display()
         squares.push(square)
+        squaresXY[row].push(square)
         currentIsWhite = !currentIsWhite
       }
       currentIsWhite = !currentIsWhite
@@ -168,11 +186,24 @@ const sketch = s => {
   }
 
   s.mousePressed = () => {
+    let moves = null
     for (let square of squares) {
       if (square.wasClicked()) {
-        square.updateColor('active')
+        if (square.figure) {
+          square.updateColor('active')
+          moves = square.getMoves()
+        }
       } else {
         square.updateColor('inactive')
+      }
+    }
+
+    // Now draw fields to which you can move
+    if (moves) {
+      for (let move of moves) {
+        if (!squaresXY[move.y][move.x].figure) {
+          squaresXY[move.y][move.x].updateColor('active')
+        }
       }
     }
   }
