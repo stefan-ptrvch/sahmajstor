@@ -16,6 +16,51 @@ export let ROWS = 8
 export let COLS = 8
 
 const sketch = s => {
+
+  // Global variables
+  // let states = [
+    // 'whitePassive',
+    // 'whiteActive',
+    // 'blackPassive',
+    // 'blackActive'
+  // ]
+
+  // let actions = [
+    // 'squareWithFigureClicked',
+    // 'movableSquareClicked',
+    // 'nonMovableSquareClicked'
+  // ]
+
+  let state = 'whitePassive'
+  let activeSquare
+  let squares = []
+  let squaresXY = []
+
+  function nextState(action) {
+    // Determines what the next state will be, depending on the current state
+    // and the action that was performed
+    // Available combinations:
+    // whitePassive, squareWithFigureClicked => whiteActive
+    // whiteActive, nonMovableSquareClicked => whitePassive
+    // whiteActive, movableSquareClicked => blackPassive
+    // blackPassive, squareWithFigureClicked => blackActive
+    // blackActive, nonMovableSquareClicked => blackPassive
+    // blackActive, movableSquareClicked => whiteActive
+    if (state === 'whitePassive' && action === 'squareWithFigureClicked') {
+      state = 'whiteActive'
+    } else if (state === 'whiteActive' && action === 'nonMovableSquareClicked') {
+      state = 'whitePassive'
+    } else if (state === 'whiteActive' && action === 'movableSquareClicked') {
+      state = 'blackPassive'
+    } else if (state === 'blackPassive' && action === 'squareWithFigureClicked') {
+      state = 'blackActive'
+    } else if (state === 'blackActive' && action === 'nonMovableSquareClicked') {
+      state = 'blackPassive'
+    } else if (state === 'blackActive' && action === 'movableSquareClicked') {
+      state = 'whitePassive'
+    }
+  }
+
   function Figure(type, player) {
     // Save which type of figure and which player it is
     this.type = type
@@ -79,10 +124,13 @@ const sketch = s => {
     // Colors of square
     this.fill = fill
     this.inactiveFill = fill
-    this.activeFill = s.color(255, 204, 0)
+    this.activeFill = s.color(41, 204, 57)
+    this.movableFill = s.color(255, 204, 0)
 
     // Figure associated with this square
     this.figure = figure
+    this.isActive = false
+    this.isMovable = false
 
     // Used to update display of this particular square
     this.display = function() {
@@ -119,14 +167,19 @@ const sketch = s => {
     this.updateColor = function(state) {
       if (state === 'active') {
         this.fill = this.activeFill
+        this.isActive = true
+        this.isMovable = false
       } else if (state === 'inactive') {
         this.fill = this.inactiveFill
+        this.isActive = false
+        this.isMovable = false
+      } else if (state === 'movable') {
+        this.fill = this.movableFill
+        this.isActive = false
+        this.isMovable = true
       }
     }
   }
-
-  let squares = []
-  let squaresXY = []
 
   s.setup = () => {
     s.createCanvas(squareSize*ROWS, squareSize*COLS)
@@ -195,12 +248,20 @@ const sketch = s => {
   }
 
   s.mousePressed = () => {
+    // Handles what happens when players interact with the board
     let moves = null
     for (let square of squares) {
       if (square.wasClicked()) {
-        if (square.figure) {
+        if (square.isMovable) {
+          // We move the figure to the new square
+          square.figure = activeSquare.figure
+          activeSquare.figure = null
+          square.updateColor('inactive')
+          console.log(nextState)
+        } else if (square.figure) {
           square.updateColor('active')
           moves = square.getMoves()
+          activeSquare = square
         }
       } else {
         square.updateColor('inactive')
@@ -211,7 +272,7 @@ const sketch = s => {
     if (moves) {
       for (let move of moves) {
         if (!squaresXY[move.y][move.x].figure) {
-          squaresXY[move.y][move.x].updateColor('active')
+          squaresXY[move.y][move.x].updateColor('movable')
         }
       }
     }
