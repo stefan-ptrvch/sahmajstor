@@ -257,11 +257,18 @@ const sketch = s => {
           square.figure = activeSquare.figure
           activeSquare.figure = null
           square.updateColor('inactive')
-          console.log(nextState)
+          nextState('movableSquareClicked')
         } else if (square.figure) {
-          square.updateColor('active')
-          moves = square.getMoves()
-          activeSquare = square
+          // We make the square active if it's the current player's figure
+          if ((state.includes('white') && square.figure.player === 'white') ||
+          (state.includes('black') && square.figure.player === 'black')) {
+            square.updateColor('active')
+            moves = square.getMoves()
+            activeSquare = square
+            nextState('squareWithFigureClicked')
+          }
+        } else {
+            nextState('nonMovableSquareClicked')
         }
       } else {
         square.updateColor('inactive')
