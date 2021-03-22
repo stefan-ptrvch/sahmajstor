@@ -190,6 +190,23 @@ const sketch = s => {
     }
   }
 
+  // Displays algebraic notation on chess board
+  function addNotation() {
+    let bottomRow = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+
+    for (let row = 0; row < ROWS; row += 1) {
+        s.textSize(10)
+        s.fill(50)
+        s.text(ROWS - row, 3, row*squareSize + 13);
+    }
+
+    for (let col = 0; col < COLS; col += 1) {
+        s.textSize(10)
+        s.fill(50)
+        s.text(bottomRow[col], col*squareSize + 60, (ROWS - 1)*squareSize + 0.95*squareSize);
+    }
+  }
+
   s.setup = () => {
     s.createCanvas(squareSize*ROWS, squareSize*COLS)
 
@@ -296,6 +313,7 @@ const sketch = s => {
     for (let square of squares) {
       square.display()
     }
+    addNotation()
   }
 
   // create methods:
