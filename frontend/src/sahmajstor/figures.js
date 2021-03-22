@@ -295,15 +295,25 @@ export function rookMoves(x, y, player, board) {
   return moves
 }
 
-export function queenMoves(x, y, player) {
-  console.log(player)
+export function queenMoves(x, y, player, board) {
+  // The queen has four possible move types
   let newX, newY
   let moves = []
 
   newX = x + 1
   newY = y + 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX += 1
     newY += 1
   }
@@ -311,7 +321,17 @@ export function queenMoves(x, y, player) {
   newX = x + 1
   newY = y - 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX += 1
     newY -= 1
   }
@@ -319,7 +339,17 @@ export function queenMoves(x, y, player) {
   newX = x - 1
   newY = y + 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX -= 1
     newY += 1
   }
@@ -327,36 +357,86 @@ export function queenMoves(x, y, player) {
   newX = x - 1
   newY = y - 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX -= 1
     newY -= 1
   }
 
-  newX = x
+  newX = x + 1
   newY = y
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX += 1
   }
 
-  newX = x
+  newX = x - 1
   newY = y
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newX -= 1
   }
 
   newX = x
-  newY = y
+  newY = y + 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newY += 1
   }
 
   newX = x
-  newY = y
+  newY = y - 1
   while (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // If there's a figure in this square, and if it's the opponent's figure,
+    // we add this move to the moves list, else we just break
+    if (!board[newY][newX].figure) {
+      moves.push({x: newX, y: newY})
+    } else if (board[newY][newX].figure.player !== player) {
+      moves.push({x: newX, y: newY})
+      break
+    } else {
+      break
+    }
+
     newY -= 1
   }
 
