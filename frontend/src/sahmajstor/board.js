@@ -207,8 +207,14 @@ const sketch = s => {
     }
   }
 
-  s.setup = () => {
-    s.createCanvas(squareSize*ROWS, squareSize*COLS)
+  // Sets a game up
+  function createGame() {
+    // Set initial state
+    state = 'whitePassive'
+    activeSquare = null
+    squares = []
+    squaresXY = []
+    moveNum = 1
 
     // Draw chess board
     let currentIsWhite = false
@@ -273,12 +279,23 @@ const sketch = s => {
     }
   }
 
+  s.setup = () => {
+    s.createCanvas(squareSize*ROWS, squareSize*COLS)
+    createGame()
+  }
+
   s.mousePressed = () => {
     // Handles what happens when players interact with the board
     let moves = null
     for (let square of squares) {
       if (square.wasClicked()) {
         if (square.isMovable) {
+          // Check if the figure that's being eaten a king
+          if (square.figure && square.figure.type === 'king') {
+            createGame()
+            break
+          }
+
           // We move the figure to the new square
           square.figure = activeSquare.figure
           activeSquare.figure = null
