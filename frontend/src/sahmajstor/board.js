@@ -172,8 +172,8 @@ const sketch = s => {
       }
     }
 
-    // Sets the color of the square
-    this.updateColor = function(state) {
+    // Sets the state of the square
+    this.updateState = function(state) {
       if (state === 'active') {
         this.fill = this.activeFill
         this.isActive = true
@@ -183,7 +183,7 @@ const sketch = s => {
         this.isActive = false
         this.isMovable = false
       } else if (state === 'movable') {
-        this.fill = this.movableFill
+        // this.fill = this.movableFill
         this.isActive = false
         this.isMovable = true
       }
@@ -265,13 +265,13 @@ const sketch = s => {
           // We move the figure to the new square
           square.figure = activeSquare.figure
           activeSquare.figure = null
-          square.updateColor('inactive')
+          square.updateState('inactive')
           nextState('movableSquareClicked')
         } else if (square.figure) {
           // We make the square active if it's the current player's figure
           if ((state.includes('white') && square.figure.player === 'white') ||
           (state.includes('black') && square.figure.player === 'black')) {
-            square.updateColor('active')
+            square.updateState('active')
             moves = square.getMoves(squaresXY)
             activeSquare = square
             nextState('squareWithFigureClicked')
@@ -280,18 +280,14 @@ const sketch = s => {
             nextState('nonMovableSquareClicked')
         }
       } else {
-        square.updateColor('inactive')
+        square.updateState('inactive')
       }
     }
 
     // Now draw fields to which you can move
     if (moves) {
       for (let move of moves) {
-        if (!squaresXY[move.y][move.x].figure) {
-          squaresXY[move.y][move.x].updateColor('movable')
-        } else {
-          squaresXY[move.y][move.x].updateColor('movable')
-        }
+        squaresXY[move.y][move.x].updateState('movable')
       }
     }
   }
