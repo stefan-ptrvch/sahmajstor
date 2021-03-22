@@ -183,7 +183,7 @@ const sketch = s => {
         this.isActive = false
         this.isMovable = false
       } else if (state === 'movable') {
-        // this.fill = this.movableFill
+        this.fill = this.movableFill
         this.isActive = false
         this.isMovable = true
       }

@@ -18,13 +18,15 @@ export let figureImagePath = {
 
 // Movesets for all figures
 export function pawnMoves(x, y, player, board) {
-  // The pawn has three different moves:
+  // The pawn has four different moves:
   // - move vertically
   // - move diagonally to the left
   // - move diagonally to the right
+  // - additional square on first move
   let newXVert, newYVert
   let newXDiaLeft, newYDiaLeft
   let newXDiaRight, newYDiaRight
+  let firstMoveX, firstMoveY
   let moves = []
 
   // Check whether we move up or down on the board, and then define all three
@@ -32,6 +34,9 @@ export function pawnMoves(x, y, player, board) {
   if (player === 'white') {
     newXVert = x
     newYVert = y - 1
+
+    firstMoveX = newXVert
+    firstMoveY = newYVert - 1
 
     newXDiaLeft = x - 1
     newYDiaLeft = y - 1
@@ -41,6 +46,9 @@ export function pawnMoves(x, y, player, board) {
   } else {
     newXVert = x
     newYVert = y + 1
+
+    firstMoveX = newXVert
+    firstMoveY = newYVert + 1
 
     newXDiaLeft = x - 1
     newYDiaLeft = y + 1
@@ -53,6 +61,13 @@ export function pawnMoves(x, y, player, board) {
   // we're not on the edge of the board
   if (newYVert < ROWS && newYVert >= 0 && !board[newYVert][newXVert].figure) {
     moves.push({x: newXVert, y: newYVert})
+
+    // If it's the first move of a pawn, a pawn gets to move an additional square
+    // I threw this check inside the above check because if there's a figure
+    // directly in front of the pawn, this move is not valid
+    if (((player === 'white' && y === COLS - 2) || (player === 'black' && y === 1)) && !board[firstMoveY][firstMoveX].figure) {
+      moves.push({x: firstMoveX, y: firstMoveY})
+    }
   }
 
   // Check if we can move diagonally
