@@ -74,8 +74,6 @@ export function pawnMoves(x, y, player, board) {
 }
 
 export function knightMoves(x, y, player, board) {
-  console.log(player)
-  console.log(board)
   // Knight has eight possible moves, and he can jump over other figures
   let newX, newY
   let moves = []
@@ -83,49 +81,59 @@ export function knightMoves(x, y, player, board) {
   newX = x + 2
   newY = y + 1
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    // We add this move to the list if the square is empty or contains a figure
+    // of the opponent
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x + 2
   newY = y - 1
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x - 2
   newY = y + 1
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x - 2
   newY = y - 1
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x + 1
   newY = y + 2
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x + 1
   newY = y - 2
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x - 1
   newY = y + 2
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   newX = x - 1
   newY = y - 2
   if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
-    moves.push({x: newX, y: newY})
+    if(!board[newY][newX].figure || board[newY][newX].figure.player !== player)
+      moves.push({x: newX, y: newY})
   }
 
   return moves
