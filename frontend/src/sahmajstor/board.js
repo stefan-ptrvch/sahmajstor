@@ -14,6 +14,7 @@ import {
 export let squareSize = 70
 export let ROWS = 8
 export let COLS = 8
+export let moveNum = 1
 
 const sketch = s => {
 
@@ -65,6 +66,7 @@ const sketch = s => {
       state = 'blackPassive'
     } else if (state === 'blackActive' && action === 'movableSquareClicked') {
       state = 'whitePassive'
+      moveNum++
     }
   }
 
@@ -192,7 +194,7 @@ const sketch = s => {
     s.createCanvas(squareSize*ROWS, squareSize*COLS)
 
     // Draw chess board
-    let currentIsWhite = true
+    let currentIsWhite = false
     let fill = 225
     let figure
     for (let row = 0; row < ROWS; row += 1) {
