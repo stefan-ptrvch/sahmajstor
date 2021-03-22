@@ -17,24 +17,66 @@ export let figureImagePath = {
 }
 
 // Movesets for all figures
-export function pawnMoves(x, y, player) {
-  let newX, newY
+export function pawnMoves(x, y, player, board) {
+  // The pawn has three different moves:
+  // - move vertically
+  // - move diagonally to the left
+  // - move diagonally to the right
+  let newXVert, newYVert
+  let newXDiaLeft, newYDiaLeft
+  let newXDiaRight, newYDiaRight
   let moves = []
+
+  // Check whether we move up or down on the board, and then define all three
+  // possible moves
   if (player === 'white') {
-    newX = x
-    newY = y - 1
+    newXVert = x
+    newYVert = y - 1
+
+    newXDiaLeft = x - 1
+    newYDiaLeft = y - 1
+
+    newXDiaRight = x + 1
+    newYDiaRight = y - 1
   } else {
-    newX = x
-    newY = y + 1
+    newXVert = x
+    newYVert = y + 1
+
+    newXDiaLeft = x - 1
+    newYDiaLeft = y + 1
+
+    newXDiaRight = x + 1
+    newYDiaRight = y + 1
   }
 
-  moves.push({x: newX, y: newY})
+  // We add this move only if there are no figures in front of the pawn, and
+  // we're not on the edge of the board
+  if (newYVert < ROWS && newYVert >= 0 && !board[newYVert][newXVert].figure) {
+    moves.push({x: newXVert, y: newYVert})
+  }
+
+  // Check if we can move diagonally
+  if (newYDiaLeft < ROWS && newYDiaLeft >= 0 &&
+    newXDiaLeft < COLS && newXDiaLeft >= 0 &&
+    board[newYDiaLeft][newXDiaLeft].figure) {
+    if (board[newYDiaLeft][newXDiaLeft].figure.player !== player)
+      moves.push({x: newXDiaLeft, y: newYDiaLeft})
+  }
+
+  if (newYDiaRight < ROWS && newYDiaRight >= 0 &&
+    newXDiaRight < COLS && newXDiaRight >= 0 &&
+    board[newYDiaRight][newXDiaRight].figure) {
+    if (board[newYDiaRight][newXDiaRight].figure.player !== player)
+      moves.push({x: newXDiaRight, y: newYDiaRight})
+  }
 
   return moves
 }
 
-export function knightMoves(x, y, player) {
+export function knightMoves(x, y, player, board) {
   console.log(player)
+  console.log(board)
+  // Knight has eight possible moves, and he can jump over other figures
   let newX, newY
   let moves = []
 

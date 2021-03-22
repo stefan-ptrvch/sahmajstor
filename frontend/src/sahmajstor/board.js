@@ -31,9 +31,16 @@ const sketch = s => {
     // 'nonMovableSquareClicked'
   // ]
 
+  // State of the game (which player is in which phase)
   let state = 'whitePassive'
+
+  // The one sqaure that was clicked on
   let activeSquare
+
+  // All squares of the board, some containing figures some not
   let squares = []
+
+  // Matrix representation of the board
   let squaresXY = []
 
   function nextState(action) {
@@ -143,10 +150,10 @@ const sketch = s => {
 
     // Returns which squares the figure on this particular square is allowed to
     // move to
-    this.getMoves = function() {
+    this.getMoves = function(board) {
       if (this.figure) {
         return this.figure.moves(this.squareX, this.squareY,
-          this.figure.player)
+          this.figure.player, board)
       } else {
         return null
       }
@@ -263,7 +270,7 @@ const sketch = s => {
           if ((state.includes('white') && square.figure.player === 'white') ||
           (state.includes('black') && square.figure.player === 'black')) {
             square.updateColor('active')
-            moves = square.getMoves()
+            moves = square.getMoves(squaresXY)
             activeSquare = square
             nextState('squareWithFigureClicked')
           }
@@ -279,6 +286,8 @@ const sketch = s => {
     if (moves) {
       for (let move of moves) {
         if (!squaresXY[move.y][move.x].figure) {
+          squaresXY[move.y][move.x].updateColor('movable')
+        } else {
           squaresXY[move.y][move.x].updateColor('movable')
         }
       }
