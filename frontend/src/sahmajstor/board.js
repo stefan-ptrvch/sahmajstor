@@ -44,6 +44,13 @@ const sketch = s => {
   // Matrix representation of the board
   let squaresXY = []
 
+  // Tracks which player is currently playing
+  let currentTurn = 'white'
+
+  // Board positions of the two kings
+  let whiteKingPos = {}
+  let blackKingPos = {}
+
   function nextState(action) {
     // Determines what the next state will be, depending on the current state
     // and the action that was performed
@@ -60,6 +67,7 @@ const sketch = s => {
       state = 'whitePassive'
     } else if (state === 'whiteActive' && action === 'movableSquareClicked') {
       state = 'blackPassive'
+      currentTurn = 'black'
     } else if (state === 'blackPassive' && action === 'squareWithFigureClicked') {
       state = 'blackActive'
     } else if (state === 'blackActive' && action === 'nonMovableSquareClicked') {
@@ -67,6 +75,7 @@ const sketch = s => {
     } else if (state === 'blackActive' && action === 'movableSquareClicked') {
       state = 'whitePassive'
       moveNum++
+      currentTurn = 'white'
     }
   }
 
@@ -207,6 +216,28 @@ const sketch = s => {
     }
   }
 
+  // Checks if the king is being attacked in the current board configuration
+  function isKingChecked() {
+    for (let square of squares) {
+      // We're only interested in opponent's figures
+      if (!square.figure || square.figure.player === currentTurn) {
+        continue
+      } else {
+        // We take the available moves of the opponents figure, and check if
+        // the king is among the available moves
+        let moves = square.getMoves(squaresXY)
+        for (let move of moves) {
+          if (currentTurn === 'white' && move.x === whiteKingPos.x && move.y === whiteKingPos.y) {
+            return true
+          } else if (currentTurn === 'black' && move.x === blackKingPos.x && move.y === blackKingPos.y) {
+            return true
+          }
+        }
+      }
+    }
+    return false
+  }
+
   // Sets a game up
   function createGame() {
     // Set initial state
@@ -215,6 +246,7 @@ const sketch = s => {
     squares = []
     squaresXY = []
     moveNum = 1
+    currentTurn = 'white'
 
     // Draw chess board
     let currentIsWhite = false
@@ -240,6 +272,8 @@ const sketch = s => {
           figure = new Figure('queen', 'black')
         } else if (row === 0 && col === 4) {
           figure = new Figure('king', 'black')
+          // Set initial position for black king
+          blackKingPos = {x: col, y: row}
         } else if (row === 0 && col === 5) {
           figure = new Figure('bishop', 'black')
         } else if (row === 0 && col === 6) {
@@ -258,6 +292,8 @@ const sketch = s => {
           figure = new Figure('queen', 'white')
         } else if (row === 7 && col === 4) {
           figure = new Figure('king', 'white')
+          // Set initial position for white king
+          whiteKingPos = {x: col, y: row}
         } else if (row === 7 && col === 5) {
           figure = new Figure('bishop', 'white')
         } else if (row === 7 && col === 6) {
@@ -296,6 +332,22 @@ const sketch = s => {
             break
           }
 
+          if (isKingChecked()) {
+            console.log('KING IS BEING ATTACKED')
+          }
+
+          // Check if the figure being moved is a king and update king position
+          // if it is
+          if (activeSquare.figure.type === 'king') {
+            if (currentTurn === 'white') {
+              whiteKingPos.x = square.squareX
+              whiteKingPos.y = square.squareY
+            } else {
+              blackKingPos.x = square.squareX
+              blackKingPos.y = square.squareY
+            }
+          }
+
           // We move the figure to the new square
           square.figure = activeSquare.figure
           activeSquare.figure = null
@@ -303,8 +355,8 @@ const sketch = s => {
           nextState('movableSquareClicked')
         } else if (square.figure) {
           // We make the square active if it's the current player's figure
-          if ((state.includes('white') && square.figure.player === 'white') ||
-          (state.includes('black') && square.figure.player === 'black')) {
+          if ((currentTurn === 'white' && square.figure.player === 'white') ||
+          (currentTurn === 'black' && square.figure.player === 'black')) {
             square.updateState('active')
             moves = square.getMoves(squaresXY)
             activeSquare = square
