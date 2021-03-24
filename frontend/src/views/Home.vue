@@ -1,14 +1,13 @@
 <template>
-  <div id="board" />
+  <plaky-chess />
 </template>
 
 <script>
-import { createBoard } from '../sahmajstor/board.js'
+import PlakyChess from '../components/PlakyChess.vue'
 
 export default {
   name: 'Home',
-  created: function() {
-    createBoard()
-  }
+
+  components: { PlakyChess }
 }
 </script>
