@@ -1,7 +1,8 @@
 <template>
   <div>
     <div id="board" />
-  </div>
+    <input v-if="pawnPromotion.dialog" v-model="pawnPromotion.figureType">
+</div>
 </template>
 
 <script>
@@ -23,13 +24,13 @@ export default {
   data() {
     return {
       board: null,
+      pawnPromotion: { dialog: false, figureType: '' }
     }
   },
 
   created: function() {
 
     let moveNum = 1
-    let pawnPromotion = { dialog: false, figureType: '' }
 
     const sketch = s => {
 
@@ -255,19 +256,15 @@ export default {
       }
 
       // Handles pawn promotion
-      function checkPawnPromotion(square) {
+      let checkPawnPromotion = (square) => {
 
         // Check if the figure was a pawn and if it's at the edge of the board
         if (square.figure.type === 'pawn' && square.figure.player === 'white' &&
           square.squareY === 0) {
-          pawnPromotion.dialog = true
-          console.log("PROMOTION WHITE")
-          console.log(pawnPromotion)
+          this.pawnPromotion.dialog = true
         } else if (square.figure.type === 'pawn' && square.figure.player ===
           'black' && square.squareY === ROWS - 1) {
-          pawnPromotion.dialog = true
-          console.log("PROMOTION BLACK")
-          console.log(pawnPromotion)
+          this.pawnPromotion.dialog = true
         }
       }
 
@@ -463,4 +460,3 @@ export default {
   }
 }
 </script>
-
