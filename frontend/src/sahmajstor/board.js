@@ -363,8 +363,6 @@ const sketch = s => {
             // This move is illegal, so we undo the move and break
             square.figure = toFigure
             activeSquare.figure = fromFigure
-            console.log(currentTurn)
-            console.log("KING IS BEING ATTACKED")
             for (let square of squares) {
               square.updateState('inactive')
             }
