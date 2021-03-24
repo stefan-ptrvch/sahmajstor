@@ -1,4 +1,4 @@
-import { ROWS, COLS } from './board.js'
+import { ROWS, COLS } from './settings.js'
 
 export let figureImagePath = {
   pawnWhiteImagePath: 'figures/white/pawn.png',
