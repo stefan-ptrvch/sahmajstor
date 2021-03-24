@@ -90,19 +90,7 @@ export default {
 
     const sketch = s => {
 
-      // Global variables
-      // let states = [
-      // 'whitePassive',
-      // 'whiteActive',
-      // 'blackPassive',
-      // 'blackActive'
-      // ]
-
-      // let actions = [
-      // 'squareWithFigureClicked',
-      // 'movableSquareClicked',
-      // 'nonMovableSquareClicked'
-      // ]
+      // Global variables for the sketch
 
       // State of the game (which player is in which phase)
       let state = 'whitePassive'
