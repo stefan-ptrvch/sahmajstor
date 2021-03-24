@@ -48,6 +48,13 @@
 </template>
 
 <script>
+
+// Global variables which track whether castling is still available
+export let castlingWhiteLeft = true
+export let castlingWhiteRight = true
+export let castlingBlackLeft = true
+export let castlingBlackRight = true
+
 import P5 from 'p5'
 import { ROWS, COLS, squareSize } from './settings.js'
 import {
@@ -317,6 +324,38 @@ export default {
         }
       }
 
+      // Disables castling flags if any of the related figures were moved
+      function updateCastlingState(square) {
+
+        // Check if the figure that was moved is a king or a rook and disable
+        // the corresponding castling flag
+        if (square.figure.type === 'king' && square.figure.player === 'white') {
+          castlingWhiteLeft = false
+          castlingWhiteRight = false
+        } else if  (square.figure.type === 'king' && square.figure.player === 'black') {
+          castlingBlackLeft = false
+          castlingBlackRight = false
+        } else if (square.figure.type === 'rook' && square.figure.player === 'white') {
+          // Check which rook was moved and disable corresponding castling flag
+          if (square.squareX === 0) {
+            castlingWhiteLeft = false
+          } else {
+            castlingWhiteRight = false
+          }
+        } else if (square.figure.type === 'rook' && square.figure.player === 'black') {
+          // Check which rook was moved and disable corresponding castling flag
+          if (square.squareX === 0) {
+            castlingBlackLeft = false
+          } else {
+            castlingBlackRight = false
+          }
+        }
+        console.log(castlingWhiteLeft)
+        console.log(castlingWhiteRight)
+        console.log(castlingBlackLeft)
+        console.log(castlingBlackRight)
+      }
+
       // Sets a game up
       function createGame() {
         // Set initial state
@@ -425,8 +464,8 @@ export default {
               activeSquare.figure = null
               square.updateState('inactive')
 
-              // Check if the figure being moved is a king and update king position
-              // if it is
+              // Check if the figure being moved is a king and update king
+              // position if it is
               if (fromFigure.type === 'king') {
                 if (currentTurn === 'white') {
                   whiteKingPos.x = square.squareX
@@ -460,8 +499,11 @@ export default {
                 break
               }
 
-              // We check if the figure that was moved is a pawn and whether it's
-              // at the edge of the board, so it can be promoted
+              // Check if any castling related figures were moved
+              updateCastlingState(square)
+
+              // We check if the figure that was moved is a pawn and whether
+              // it's at the edge of the board, so it can be promoted
               checkPawnPromotion(square)
 
               nextState('movableSquareClicked')

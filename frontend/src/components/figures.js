@@ -1,4 +1,10 @@
 import { ROWS, COLS } from './settings.js'
+// import {
+  // castlingWhiteLeft,
+  // castlingWhiteRight,
+  // castlingBlackLeft,
+  // castlingBlackRight
+// } from './PlakyChess.vue'
 
 export let figureImagePath = {
   pawnWhiteImagePath: 'figures/white/pawn.png',
