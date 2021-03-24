@@ -217,19 +217,19 @@ const sketch = s => {
   }
 
   // Checks if the king is being attacked in the current board configuration
-  function isKingChecked() {
+  function isKingChecked(player) {
     for (let square of squares) {
       // We're only interested in opponent's figures
-      if (!square.figure || square.figure.player === currentTurn) {
+      if (!square.figure || square.figure.player === player) {
         continue
       } else {
         // We take the available moves of the opponents figure, and check if
         // the king is among the available moves
         let moves = square.getMoves(squaresXY)
         for (let move of moves) {
-          if (currentTurn === 'white' && move.x === whiteKingPos.x && move.y === whiteKingPos.y) {
+          if (player === 'white' && move.x === whiteKingPos.x && move.y === whiteKingPos.y) {
             return true
-          } else if (currentTurn === 'black' && move.x === blackKingPos.x && move.y === blackKingPos.y) {
+          } else if (player === 'black' && move.x === blackKingPos.x && move.y === blackKingPos.y) {
             return true
           }
         }
@@ -323,6 +323,11 @@ const sketch = s => {
   s.mousePressed = () => {
     // Handles what happens when players interact with the board
     let moves = null
+
+    // Figures that are having an interaction
+    let fromFigure = null
+    let toFigure = null
+
     for (let square of squares) {
       if (square.wasClicked()) {
         if (square.isMovable) {
@@ -332,13 +337,18 @@ const sketch = s => {
             break
           }
 
-          if (isKingChecked()) {
-            console.log('KING IS BEING ATTACKED')
-          }
+          // We move the figure to the new square, but remember the figures
+          // because we have to check the validity of the move after moving
+          // (should do the check before moving the figure, but too lazy)
+          toFigure = square.figure
+          fromFigure = activeSquare.figure
+          square.figure = activeSquare.figure
+          activeSquare.figure = null
+          square.updateState('inactive')
 
           // Check if the figure being moved is a king and update king position
           // if it is
-          if (activeSquare.figure.type === 'king') {
+          if (fromFigure.type === 'king') {
             if (currentTurn === 'white') {
               whiteKingPos.x = square.squareX
               whiteKingPos.y = square.squareY
@@ -348,11 +358,33 @@ const sketch = s => {
             }
           }
 
-          // We move the figure to the new square
-          square.figure = activeSquare.figure
-          activeSquare.figure = null
-          square.updateState('inactive')
+          // Check if the king is being attacked after this move
+          if (isKingChecked(currentTurn)) {
+            // This move is illegal, so we undo the move and break
+            square.figure = toFigure
+            activeSquare.figure = fromFigure
+            console.log(currentTurn)
+            console.log("KING IS BEING ATTACKED")
+            for (let square of squares) {
+              square.updateState('inactive')
+            }
+
+            // If the figure that was moved was the king, revert the king
+            // position tracker back
+            if (fromFigure.type === 'king') {
+              if (currentTurn === 'white') {
+                whiteKingPos.x = activeSquare.squareX
+                whiteKingPos.y = activeSquare.squareY
+              } else {
+                blackKingPos.x = activeSquare.squareX
+                blackKingPos.y = activeSquare.squareY
+              }
+            }
+              break
+            }
+
           nextState('movableSquareClicked')
+
         } else if (square.figure) {
           // We make the square active if it's the current player's figure
           if ((currentTurn === 'white' && square.figure.player === 'white') ||
