@@ -1,7 +1,49 @@
 <template>
   <div>
     <div id="board" />
-    <input v-if="pawnPromotion.dialog" v-model="pawnPromotion.figureType">
+    <v-dialog
+      v-model="pawnPromotion.dialog"
+      width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Pick a promotion
+        </v-card-title>
+
+      <v-container fluid>
+        <v-row>
+          <v-col>
+            <v-radio-group
+              v-model="pawnPromotion.figureType"
+              class="d-flex justify-center"
+
+            >
+              <v-radio
+                v-for="n in ['rook', 'knight', 'bishop', 'queen']"
+                :key="n"
+                :label="`${n}`"
+                :value="n"
+                />
+            </v-radio-group>
+          </v-col>
+        </v-row>
+      </v-container>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="updatePawn"
+          >
+            Pick
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </div>
 </template>
 
@@ -24,7 +66,21 @@ export default {
   data() {
     return {
       board: null,
-      pawnPromotion: { dialog: false, figureType: '' }
+      pawnPromotion: { dialog: false, figureType: '', square: null },
+      Figure: null
+    }
+  },
+
+  methods: {
+    updatePawn() {
+      // Swap the pawn for a new figure
+      this.pawnPromotion.square.figure = new this.Figure(
+        this.pawnPromotion.figureType,
+        this.pawnPromotion.square.figure.player)
+
+      // Clear selected figure type and close dialog
+      this.pawnPromotion.figureType = ''
+      this.pawnPromotion.dialog = false
     }
   },
 
@@ -145,6 +201,9 @@ export default {
         }
       }
 
+      // Bind function to Vue data
+      this.Figure = Figure
+
       function Square(x, y, fill, figure=null) {
         // One square, which can hold one of the available figures
 
@@ -261,9 +320,11 @@ export default {
         // Check if the figure was a pawn and if it's at the edge of the board
         if (square.figure.type === 'pawn' && square.figure.player === 'white' &&
           square.squareY === 0) {
+          this.pawnPromotion.square = square
           this.pawnPromotion.dialog = true
         } else if (square.figure.type === 'pawn' && square.figure.player ===
           'black' && square.squareY === ROWS - 1) {
+          this.pawnPromotion.square = square
           this.pawnPromotion.dialog = true
         }
       }

@@ -520,5 +520,4 @@ export function kingMoves(x, y, player, board) {
   }
 
   return moves
-
 }
