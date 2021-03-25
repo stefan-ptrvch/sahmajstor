@@ -350,10 +350,6 @@ export default {
             castlingBlackRight = false
           }
         }
-        console.log(castlingWhiteLeft)
-        console.log(castlingWhiteRight)
-        console.log(castlingBlackLeft)
-        console.log(castlingBlackRight)
       }
 
       // Sets a game up
@@ -497,6 +493,37 @@ export default {
                   }
                 }
                 break
+              }
+
+              // Check if castling was performed, and move the corresponding
+              // rook if it was
+              if (castlingWhiteLeft && currentTurn === 'white' && square.figure.type === 'king') {
+                if (square.squareX === 2 && square.squareY === 7) {
+                  // Move the left white rook
+                  squaresXY[7][3].figure = squaresXY[7][0].figure
+                  squaresXY[7][0].figure = null
+                }
+              }
+              if (castlingWhiteRight && currentTurn === 'white' && square.figure.type === 'king') {
+                if (square.squareX === 6 && square.squareY === 7) {
+                  // Move the right white rook
+                  squaresXY[7][5].figure = squaresXY[7][7].figure
+                  squaresXY[7][7].figure = null
+                }
+              }
+              if (castlingBlackLeft && currentTurn === 'black' && square.figure.type === 'king') {
+                if (square.squareX === 2 && square.squareY === 0) {
+                  // Move the left black rook
+                  squaresXY[0][3].figure = squaresXY[0][0].figure
+                  squaresXY[0][0].figure = null
+                }
+              }
+              if (castlingBlackRight && currentTurn === 'black' && square.figure.type === 'king') {
+                if (square.squareX === 6 && square.squareY === 0) {
+                  // Move the right white rook
+                  squaresXY[0][5].figure = squaresXY[0][7].figure
+                  squaresXY[0][7].figure = null
+                }
               }
 
               // Check if any castling related figures were moved

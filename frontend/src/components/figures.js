@@ -1,10 +1,10 @@
 import { ROWS, COLS } from './settings.js'
-// import {
-  // castlingWhiteLeft,
-  // castlingWhiteRight,
-  // castlingBlackLeft,
-  // castlingBlackRight
-// } from './PlakyChess.vue'
+import {
+  castlingWhiteLeft,
+  castlingWhiteRight,
+  castlingBlackLeft,
+  castlingBlackRight
+} from './PlakyChess.vue'
 
 export let figureImagePath = {
   pawnWhiteImagePath: 'figures/white/pawn.png',
@@ -465,7 +465,7 @@ export function queenMoves(x, y, player, board) {
 }
 
 export function kingMoves(x, y, player, board) {
-  // The king has eight moves total
+  // The king has eight normal moves and two castling moves
   let newX, newY
   let moves = []
 
@@ -525,5 +525,73 @@ export function kingMoves(x, y, player, board) {
       moves.push({x: newX, y: newY})
   }
 
+  // Now we check for castling related moves
+  if (player === 'white' && castlingWhiteLeft) {
+    // Check if there are any figures blocking the way
+    if (!board[7][2].figure && !board[7][3].figure) {
+
+      // Check if any of the fields the king is moving over are under attack
+      if (!isUnderAttack('black', [{y: 7, x: 2}, {y: 7, x: 3}], board)) {
+        moves.push({x: 2, y: 7})
+      }
+    }
+  }
+  if (player === 'white' && castlingWhiteRight) {
+    // Check if there are any figures blocking the way
+    if (!board[7][5].figure && !board[7][6].figure) {
+
+      // Check if any of the fields the king is moving over are under attack
+      if (!isUnderAttack('black', [{y: 7, x: 5}, {y: 7, x: 6}], board)) {
+        moves.push({x: 6, y: 7})
+      }
+    }
+  }
+  if (player === 'black' && castlingBlackLeft) {
+    // Check if there are any figures blocking the way
+    if (!board[0][2].figure && !board[0][3].figure) {
+
+      // Check if any of the fields the king is moving over are under attack
+      if (!isUnderAttack('white', [{y: 0, x: 2}, {y: 0, x: 3}], board)) {
+        moves.push({x: 2, y: 0})
+      }
+    }
+  }
+  if (player === 'black' && castlingBlackRight) {
+    // Check if there are any figures blocking the way
+    if (!board[0][5].figure && !board[0][6].figure) {
+
+      // Check if any of the fields the king is moving over are under attack
+      if (!isUnderAttack('white', [{y: 0, x: 5}, {y: 0, x: 6}], board)) {
+        moves.push({x: 6, y: 0})
+      }
+    }
+  }
+
   return moves
+}
+
+// Checks if `squares` are under attack by any figures by `player`
+function isUnderAttack(player, squares, board) {
+  for (let row of board) {
+    for (let square of row) {
+      // We're only interested in opponent's figures
+      // We also skip the king since we'll get into infinite recursion if both
+      // kings have castling checks
+      if (!square.figure || square.figure.type === 'king' || square.figure.player !== player) {
+        continue
+      } else {
+        // We take the available moves of the opponents figure, and check if
+        // the fields of interest are among the available moves
+        let opponentMoves = square.getMoves(board)
+        for (let move of opponentMoves) {
+          for (let squareUnderTest of squares) {
+            if (move.x === squareUnderTest.x && move.y === squareUnderTest.y) {
+              return true
+            }
+          }
+        }
+      }
+    }
+  }
+  return false
 }
