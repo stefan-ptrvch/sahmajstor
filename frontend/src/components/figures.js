@@ -3,7 +3,8 @@ import {
   castlingWhiteLeft,
   castlingWhiteRight,
   castlingBlackLeft,
-  castlingBlackRight
+  castlingBlackRight,
+  enPassant
 } from './PlakyChess.vue'
 
 export let figureImagePath = {
@@ -24,11 +25,12 @@ export let figureImagePath = {
 
 // Movesets for all figures
 export function pawnMoves(x, y, player, board) {
-  // The pawn has four different moves:
+  // The pawn has five different moves:
   // - move vertically
   // - move diagonally to the left
   // - move diagonally to the right
   // - additional square on first move
+  // - en-passant move
   let newXVert, newYVert
   let newXDiaLeft, newYDiaLeft
   let newXDiaRight, newYDiaRight
@@ -89,6 +91,27 @@ export function pawnMoves(x, y, player, board) {
     board[newYDiaRight][newXDiaRight].figure) {
     if (board[newYDiaRight][newXDiaRight].figure.player !== player)
       moves.push({x: newXDiaRight, y: newYDiaRight})
+  }
+
+  // Check if en-passant moves are available
+  if (player === 'white' && y === 3) {
+    let enPassantLeft = x - 1
+    let enPassantRight = x + 1
+    if (enPassantLeft >= 0 && enPassant['black'][enPassantLeft]) {
+      moves.push({x: enPassantLeft, y: y -  1})
+    }
+    if (enPassantRight < COLS && enPassant['black'][enPassantRight]) {
+      moves.push({x: enPassantRight, y: y -  1})
+    }
+  } else if (player === 'black' && y === 4) {
+    let enPassantLeft = x - 1
+    let enPassantRight = x + 1
+    if (enPassantLeft >= 0 && enPassant['white'][enPassantLeft]) {
+      moves.push({x: enPassantLeft, y: y +  1})
+    }
+    if (enPassantRight < COLS && enPassant['white'][enPassantRight]) {
+      moves.push({x: enPassantRight, y: y +  1})
+    }
   }
 
   return moves

@@ -55,6 +55,12 @@ export let castlingWhiteRight = true
 export let castlingBlackLeft = true
 export let castlingBlackRight = true
 
+// Global variable which tracks en-passant state
+export let enPassant = {
+  white: [false, false, false, false, false, false, false, false],
+  black: [false, false, false, false, false, false, false, false]
+}
+
 import P5 from 'p5'
 import { ROWS, COLS, squareSize } from './settings.js'
 import {
@@ -493,6 +499,43 @@ export default {
                   }
                 }
                 break
+              }
+
+              // Check if en-passant was performed
+              if (square.figure.type === 'pawn' && activeSquare.squareX !== square.squareX && !toFigure) {
+                // En-passant was performed, so we remove the corresponding
+                // pawn
+                if (currentTurn === 'white') {
+                  squaresXY[square.squareY + 1][square.squareX].figure = null
+                } else {
+                  squaresXY[square.squareY - 1][square.squareX].figure = null
+                }
+              }
+
+              // Check if a pawn has moved two squares and set corresponding
+              // en-passant flag
+              if (square.figure.type === 'pawn') {
+                if (square.squareY ===  4 && currentTurn === 'white') {
+                  if (activeSquare.squareY === 6) {
+                    enPassant[currentTurn][square.squareX] = true
+                  }
+                } else if (square.squareY === 3 && currentTurn === 'black') {
+                  if (activeSquare.squareY === 1) {
+                    enPassant[currentTurn][square.squareX] = true
+                  }
+                }
+              }
+
+              // At the end of the turn we clear all active en-passant states
+              // of the opponent
+              if (currentTurn === 'white') {
+                for (let i = 0; i < enPassant['black'].length; i++) {
+                  enPassant['black'][i] = false
+                }
+              } else {
+                for (let i = 0; i < enPassant['black'].length; i++) {
+                  enPassant['white'][i] = false
+                }
               }
 
               // Check if castling was performed, and move the corresponding
