@@ -1,3 +1,25 @@
+use pyo3::prelude::*;
+
+/// Formats the sum of two numbers as string.
+#[pyfunction]
+fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+    Ok((a + b).to_string())
+}
+
+#[pyfunction]
+fn test_it() -> PyResult<String> {
+    let _board = Board::new();
+    Ok(String::from("IT WERKS!!!"))
+}
+
+/// A Python module implemented in Rust.
+#[pymodule]
+fn plakychess(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+    m.add_function(wrap_pyfunction!(test_it, m)?)?;
+    Ok(())
+}
+
 const ROWS: usize = 2;
 const COLS: usize = 2;
 
@@ -24,7 +46,8 @@ impl Board {
 #[derive(PartialEq)]
 enum PlayerName {
     WHITE,
-    BLACK
+    BLACK,
+    NEITHER
 }
 
 #[derive(PartialEq)]

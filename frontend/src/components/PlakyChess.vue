@@ -44,6 +44,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-btn
+      @click="checkApi"
+    >
+      test
+    </v-btn>
 </div>
 </template>
 
@@ -80,11 +85,41 @@ export default {
     return {
       board: null,
       pawnPromotion: { dialog: false, figureType: '', square: null },
-      Figure: null
+      Figure: null,
+      squares: []
     }
   },
 
   methods: {
+    checkApi() {
+
+      // Construct current state of board
+      let currentState = []
+      for (let square of this.squares) {
+        currentState.push({
+          x: square.squareX,
+          y: square.squareY,
+          figure: square.figure ? square.figure.type.toUpperCase() : 'EMPTY',
+          belongs_to: square.figure ? square.figure.player.toUpperCase() : 'NEITHER'
+        })
+      }
+
+      // Send state to backend
+      fetch('http://localhost:5001/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentState),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data)
+      })
+      .catch((error) => {
+        console.error('Error:', error)
+      })
+    },
     updatePawn() {
       // Swap the pawn for a new figure
       this.pawnPromotion.square.figure = new this.Figure(
@@ -607,6 +642,7 @@ export default {
         for (let square of squares) {
           square.display()
         }
+        this.squares = squares
         addNotation()
       }
 
