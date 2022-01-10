@@ -1,21 +1,19 @@
 use pyo3::prelude::*;
-
-/// Formats the sum of two numbers as string.
-#[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
-}
+use std::collections::HashMap;
 
 #[pyfunction]
-fn test_it() -> PyResult<String> {
+fn test_it(board: Vec<HashMap<String, String>>) -> PyResult<String> {
     let _board = Board::new();
-    Ok(String::from("IT WERKS!!!"))
+
+    match board[0].get("figure") {
+        Some(x) => return Ok(x.clone()),
+        None    => return Ok(String::from("Issue with JSON formatting!"))
+    }
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn plakychess(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_function(wrap_pyfunction!(test_it, m)?)?;
     Ok(())
 }

@@ -93,12 +93,12 @@ export default {
   methods: {
     checkApi() {
 
-      // Construct current state of board
-      let currentState = []
+      // Construct current state of game
+      let board = []
       for (let square of this.squares) {
-        currentState.push({
-          x: square.squareX,
-          y: square.squareY,
+        board.push({
+          x: String(square.squareX),
+          y: String(square.squareY),
           figure: square.figure ? square.figure.type.toUpperCase() : 'EMPTY',
           belongs_to: square.figure ? square.figure.player.toUpperCase() : 'NEITHER'
         })
@@ -110,7 +110,9 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(currentState),
+        body: JSON.stringify({
+          board: board
+        }),
       })
       .then(response => response.json())
       .then(data => {
