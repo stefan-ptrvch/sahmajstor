@@ -2,53 +2,73 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 
 #[pyfunction]
-fn test_it(board: Vec<HashMap<String, String>>) -> PyResult<String> {
-    let _board = Board::new();
+fn get_next_move(board_description: Vec<HashMap<String, String>>) -> PyResult<String> {
+    // Constructs a Board, finds the next move, and generates available moves
+    // for the player
+    let board = Board::new(&board_description);
 
-    match board[0].get("figure") {
-        Some(x) => return Ok(x.clone()),
-        None    => return Ok(String::from("Issue with JSON formatting!"))
-    }
+    // Check whether we can generate some moves
+    let moves = board.get_moves(1, 1);
+    println!("{:?}", moves);
+
+    Ok(String::from("WERKS!!!"))
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn plakychess(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(test_it, m)?)?;
+    m.add_function(wrap_pyfunction!(get_next_move, m)?)?;
     Ok(())
 }
 
-const ROWS: usize = 2;
-const COLS: usize = 2;
+const ROWS: usize = 8;
+const COLS: usize = 8;
 
 pub struct Board {
-    board_state: [[Square; ROWS]; COLS]
+    board_state: [[Square; COLS]; ROWS]
 }
 
 impl Board {
-    pub fn new() -> Self {
-        let board_state = [
-            [
-                Square { x: 1, y: 1, content: SquareContent::PAWN, belongs_to: PlayerName::WHITE },
-                Square { x: 1, y: 1, content: SquareContent::ROOK, belongs_to: PlayerName::WHITE }
-            ],
-            [
-                Square { x: 1, y: 1, content: SquareContent::KING, belongs_to: PlayerName::WHITE },
-                Square { x: 1, y: 1, content: SquareContent::QUEEN, belongs_to: PlayerName::WHITE }
-            ]
-        ];
+    pub fn new(board_description: &Vec<HashMap<String, String>>) -> Self {
+        let mut board_state = [[Square { x: 0, y: 0, content: SquareContent::EMPTY, belongs_to: PlayerName::NEITHER }; COLS]; ROWS];
+        for square in board_description.iter() {
+            let x = square.get("x").unwrap().parse::<usize>().unwrap();
+            let y = square.get("y").unwrap().parse::<usize>().unwrap();
+            board_state[y][x].x = x;
+            board_state[y][x].y = y;
+            match square.get("figure").unwrap().as_str() {
+                "PAWN" => board_state[y][x].content = SquareContent::PAWN,
+                "KNIGHT" => board_state[y][x].content = SquareContent::KNIGHT,
+                "BISHOP" => board_state[y][x].content = SquareContent::BISHOP,
+                "ROOK" => board_state[y][x].content = SquareContent::ROOK,
+                "QUEEN" => board_state[y][x].content = SquareContent::QUEEN,
+                "KING" => board_state[y][x].content = SquareContent::KING,
+                "EMPTY" => board_state[y][x].content = SquareContent::EMPTY,
+                x => panic!("Invalid figure type {:?}", x)
+            }
+            match square.get("belongs_to").unwrap().as_str() {
+                "WHITE" => board_state[y][x].belongs_to = PlayerName::WHITE,
+                "BLACK" => board_state[y][x].belongs_to = PlayerName::BLACK,
+                "NEITHER" => board_state[y][x].belongs_to = PlayerName::NEITHER,
+                x => panic!("Invalid player type {:?}", x)
+            }
+        }
         return Board { board_state }
+    }
+
+    pub fn get_moves(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
+        return self.board_state[y][x].get_moves(&self.board_state);
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 enum PlayerName {
     WHITE,
     BLACK,
     NEITHER
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 enum SquareContent {
     PAWN,
     KNIGHT,
@@ -59,6 +79,7 @@ enum SquareContent {
     EMPTY
 }
 
+#[derive(Copy, Clone)]
 struct Square {
     x: usize,
     y: usize,
@@ -67,7 +88,7 @@ struct Square {
 }
 
 impl Square {
-    fn get_moves(&self, board_state: &[[Square; ROWS]; COLS]) -> Vec<(usize, usize)> {
+    fn get_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
         match self.content {
             SquareContent::PAWN => { return self.pawn_moves(&board_state) },
             SquareContent::KNIGHT => { return Vec::new() },
@@ -79,7 +100,7 @@ impl Square {
         }
     }
 
-    fn pawn_moves(&self, board_state: &[[Square; ROWS]; COLS]) -> Vec<(usize, usize)> {
+    fn pawn_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
         // The pawn has five different moves:
         // - move vertically
         // - move diagonally to the left

@@ -22,7 +22,7 @@ def api_handler():
     if request.method == "POST":
         game_state = request.get_json()
         print(game_state)
-        print(plakychess.test_it(game_state["board"]))
+        print(plakychess.get_next_move(game_state["board"]))
         return jsonify()
 
 if __name__ == "__main__":
