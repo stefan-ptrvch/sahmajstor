@@ -2,19 +2,25 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 
 #[pyfunction]
-fn get_next_move(board_description: Vec<HashMap<String, String>>) -> PyResult<String> {
+fn get_next_move(board_description: Vec<HashMap<String, String>>) -> PyResult<((usize, usize), Vec<(usize, usize)>)> {
     // Constructs a Board, finds the next move, and generates available moves
     // for the player
     let board = Board::new(&board_description);
 
-    // Check whether we can generate some moves
-    let moves = board.get_moves(1, 1);
-    println!("{:?}", moves);
+    // Get bot move
+    // Currenly hardcoded, next step will be random
+    let bot_move = (4, 3);
 
-    Ok(String::from("WERKS!!!"))
+    // Get all available moves for player
+    // let available_player_moves =
+
+    // Check whether we can generate some moves
+    let moves = board.get_moves(0, 1);
+
+    Ok(( moves))
 }
 
-/// A Python module implemented in Rust.
+/// A Python module implemented in Rust
 #[pymodule]
 fn plakychess(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_next_move, m)?)?;
@@ -107,64 +113,67 @@ impl Square {
         // - move diagonally to the right
         // - additional square on first move
         // - en-passant move
-        let (mut new_x_vert, mut new_y_vert) = (self.x, self.y);
-        let (mut new_x_dia_left, mut new_y_dia_left) = (self.x, self.y);
-        let (mut new_x_dia_right, mut new_y_dia_right) = (self.x, self.y);
-        let (mut first_move_x, mut first_move_y) = (self.x, self.y);
         let mut moves = Vec::new();
 
         // Check whether we move up or down on the board, and then define all
-        // three possible moves
+        // four possible moves
         if self.belongs_to == PlayerName::WHITE {
-          new_x_vert = self.x;
-          new_y_vert = self.y - 1;
 
-          first_move_x = new_x_vert;
-          first_move_y = new_y_vert - 1;
+            // We add this move only if there are no figures in front of the
+            // pawn, and we're not on the edge of the board
+            if self.y > 0 && board_state[self.y - 1][self.x].content == SquareContent::EMPTY {
+              moves.push((self.x, self.y - 1));
 
-          new_x_dia_left = self.x - 1;
-          new_y_dia_left = self.y - 1;
+              // If it's the first move of a pawn, a pawn gets to move an
+              // additional square; I threw this check inside the above check
+              // because if there's a figure directly in front of the pawn,
+              // this move is not valid
+              if self.y == ROWS - 2 && board_state[self.y - 2][self.x].content == SquareContent::EMPTY {
+                moves.push((self.x, self.y - 2));
+              }
+            }
 
-          new_x_dia_right = self.x + 1;
-          new_y_dia_right = self.y - 1;
+            // Check if we can move diagonally
+            if self.y > 0 && self.x > 0 && board_state[self.y - 1][self.x - 1].content != SquareContent::EMPTY {
+              if board_state[self.y - 1][self.x - 1].belongs_to != self.belongs_to {
+                moves.push((self.x - 1, self.y - 1));
+              }
+            }
+
+            if self.y > 0 && self.x < COLS - 1 && board_state[self.y - 1][self.x + 1].content != SquareContent::EMPTY {
+              if board_state[self.y - 1][self.x + 1].belongs_to != self.belongs_to {
+                moves.push((self.x + 1, self.y - 1));
+              }
+            }
+
         } else {
-          new_x_vert = self.x;
-          new_y_vert = self.y + 1;
 
-          first_move_x = new_x_vert;
-          first_move_y = new_y_vert + 1;
+            // We add this move only if there are no figures in front of the
+            // pawn, and we're not on the edge of the board
+            if self.y < ROWS - 1 && board_state[self.y + 1][self.x].content == SquareContent::EMPTY {
+              moves.push((self.x, self.y + 1));
 
-          new_x_dia_left = self.x - 1;
-          new_y_dia_left = self.y + 1;
+              // If it's the first move of a pawn, a pawn gets to move an
+              // additional square; I threw this check inside the above check
+              // because if there's a figure directly in front of the pawn,
+              // this move is not valid
+              if self.y == 1 && board_state[self.y + 1][self.x].content == SquareContent::EMPTY {
+                moves.push((self.x, self.y + 2));
+              }
+            }
 
-          new_x_dia_right = self.x + 1;
-          new_y_dia_right = self.y + 1;
-        }
+            // Check if we can move diagonally
+            if self.y < ROWS - 1 && self.x > 0 && board_state[self.y + 1][self.x - 1].content != SquareContent::EMPTY {
+              if board_state[self.y + 1][self.x - 1].belongs_to != self.belongs_to {
+                moves.push((self.x - 1, self.y + 1));
+              }
+            }
 
-        // We add this move only if there are no figures in front of the pawn,
-        // and we're not on the edge of the board
-        if new_y_vert < ROWS && new_y_vert >= 0 && board_state[new_y_vert][new_x_vert].content == SquareContent::EMPTY {
-          moves.push((new_x_vert, new_y_vert));
-
-          // If it's the first move of a pawn, a pawn gets to move an additional square
-          // I threw this check inside the above check because if there's a
-          // figure directly in front of the pawn, this move is not valid
-          if ((self.belongs_to == PlayerName::WHITE && self.y == COLS - 2) || (self.belongs_to == PlayerName::BLACK && self.y == 1)) && board_state[first_move_y][first_move_x].content == SquareContent::EMPTY {
-            moves.push((first_move_x, first_move_y));
-          }
-        }
-
-        // Check if we can move diagonally
-        if new_y_dia_left < ROWS && new_y_dia_left >= 0 && new_x_dia_left < COLS && new_x_dia_left >= 0 && board_state[new_y_dia_left][new_x_dia_left].content != SquareContent::EMPTY {
-          if board_state[new_y_dia_left][new_x_dia_left].belongs_to != self.belongs_to {
-            moves.push((new_x_dia_left, new_y_dia_left));
-          }
-        }
-
-        if new_y_dia_right < ROWS && new_y_dia_right >= 0 && new_x_dia_right < COLS && new_x_dia_right >= 0 && board_state[new_y_dia_right][new_x_dia_right].content != SquareContent::EMPTY {
-          if board_state[new_y_dia_right][new_x_dia_right].belongs_to != self.belongs_to {
-            moves.push((new_x_dia_right, new_y_dia_right));
-          }
+            if self.y < ROWS - 1 && self.x < COLS - 1 && board_state[self.y + 1][self.x + 1].content != SquareContent::EMPTY {
+              if board_state[self.y + 1][self.x + 1].belongs_to != self.belongs_to {
+                moves.push((self.x + 1, self.y + 1));
+              }
+            }
         }
 
         // Check if en-passant moves are available
