@@ -115,7 +115,7 @@ impl Square {
             SquareContent::PAWN => { return self.pawn_moves(&board_state) },
             SquareContent::KNIGHT => { return self.knight_moves(&board_state) },
             SquareContent::BISHOP => { return self.bishop_moves(&board_state) },
-            SquareContent::ROOK => { return Vec::new() },
+            SquareContent::ROOK => { return self.rook_moves(&board_state) },
             SquareContent::QUEEN => { return Vec::new() },
             SquareContent::KING => { return Vec::new() },
             SquareContent::EMPTY =>  { return Vec::new() }
@@ -352,6 +352,77 @@ impl Square {
         // If there's a figure in this square, and if it's the opponent's figure,
         // we add this move to the moves list, else we just break
         new_x -= 1;
+        new_y -= 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY {
+          moves.push((new_x, new_y));
+        } else if board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+          break;
+        } else {
+          break;
+        }
+      }
+
+      return moves
+    }
+
+    fn rook_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
+      // The rook has four possible move types
+      let mut new_x = self.x;
+      let mut new_y = self.y;
+      let mut moves = Vec::new();
+
+      while new_x < COLS - 1 {
+        // If there's a figure in this square, and if it's the opponent's figure,
+        // we add this move to the moves list, else we just break
+        new_x += 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY {
+          moves.push((new_x, new_y));
+        } else if board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+          break;
+        } else {
+          break;
+        }
+      }
+
+      new_x = self.x;
+      new_y = self.y;
+      while new_x > 1 {
+        // If there's a figure in this square, and if it's the opponent's figure,
+        // we add this move to the moves list, else we just break
+        new_x -= 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY {
+          moves.push((new_x, new_y));
+        } else if board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+          break;
+        } else {
+          break;
+        }
+      }
+
+      new_x = self.x;
+      new_y = self.y;
+      while new_y < ROWS - 1 {
+        // If there's a figure in this square, and if it's the opponent's figure,
+        // we add this move to the moves list, else we just break
+        new_y += 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY {
+          moves.push((new_x, new_y));
+        } else if board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+          break;
+        } else {
+          break;
+        }
+      }
+
+      new_x = self.x;
+      new_y = self.y;
+      while new_y > 1 {
+        // If there's a figure in this square, and if it's the opponent's figure,
+        // we add this move to the moves list, else we just break
         new_y -= 1;
         if board_state[new_y][new_x].content == SquareContent::EMPTY {
           moves.push((new_x, new_y));
