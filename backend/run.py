@@ -21,9 +21,7 @@ def api_handler():
         return jsonify({"hello": "world"})
     if request.method == "POST":
         game_state = request.get_json()
-        print(game_state)
-        print(plakychess.get_next_move(game_state["board"]))
-        return jsonify()
+        return jsonify(plakychess.get_next_move(game_state["board"]))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5001", debug=True)

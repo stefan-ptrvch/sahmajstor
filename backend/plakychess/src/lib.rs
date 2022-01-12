@@ -2,22 +2,19 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 
 #[pyfunction]
-fn get_next_move(board_description: Vec<HashMap<String, String>>) -> PyResult<((usize, usize), Vec<(usize, usize)>)> {
+fn get_next_move(board_description: Vec<HashMap<String, String>>) -> PyResult<([(usize, usize); 2], Vec<[Vec<(usize, usize)>; COLS]>)> {
     // Constructs a Board, finds the next move, and generates available moves
     // for the player
     let board = Board::new(&board_description);
 
     // Get bot move
     // Currenly hardcoded, next step will be random
-    let bot_move = (4, 3);
+    let bot_move = [(3, 4), (4, 3)];
 
     // Get all available moves for player
-    // let available_player_moves =
+    let available_player_moves = Vec::from(board.get_available_moves(PlayerName::WHITE));
 
-    // Check whether we can generate some moves
-    let moves = board.get_moves(0, 1);
-
-    Ok(( moves))
+    Ok((bot_move, available_player_moves))
 }
 
 /// A Python module implemented in Rust
@@ -29,6 +26,24 @@ fn plakychess(_py: Python, m: &PyModule) -> PyResult<()> {
 
 const ROWS: usize = 8;
 const COLS: usize = 8;
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum PlayerName {
+    WHITE,
+    BLACK,
+    NEITHER
+}
+
+#[derive(PartialEq, Copy, Clone)]
+enum SquareContent {
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING,
+    EMPTY
+}
 
 pub struct Board {
     board_state: [[Square; COLS]; ROWS]
@@ -65,24 +80,25 @@ impl Board {
     pub fn get_moves(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
         return self.board_state[y][x].get_moves(&self.board_state);
     }
-}
 
-#[derive(PartialEq, Copy, Clone)]
-enum PlayerName {
-    WHITE,
-    BLACK,
-    NEITHER
-}
+    pub fn get_available_moves(&self, player: PlayerName) -> [[Vec<(usize, usize)>; COLS]; ROWS] {
+        // Loop through board to find the player's available pieces, and get
+        // possible moves for every single one
+        let mut available_moves: [[Vec<(usize, usize)>; COLS]; ROWS] = Default::default();
 
-#[derive(PartialEq, Copy, Clone)]
-enum SquareContent {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
-    EMPTY
+        for column in self.board_state.iter() {
+            for square in column.iter() {
+                if square.belongs_to != player {
+                    continue
+                }
+                let moves = square.get_moves(&self.board_state);
+                if moves.len() > 0 {
+                    available_moves[square.y][square.x].extend(moves);
+                }
+            }
+        }
+        return available_moves
+    }
 }
 
 #[derive(Copy, Clone)]
