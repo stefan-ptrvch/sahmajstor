@@ -113,7 +113,7 @@ impl Square {
     fn get_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
         match self.content {
             SquareContent::PAWN => { return self.pawn_moves(&board_state) },
-            SquareContent::KNIGHT => { return Vec::new() },
+            SquareContent::KNIGHT => { return self.knight_moves(&board_state) },
             SquareContent::BISHOP => { return Vec::new() },
             SquareContent::ROOK => { return Vec::new() },
             SquareContent::QUEEN => { return Vec::new() },
@@ -214,5 +214,80 @@ impl Square {
         // }
 
         return moves
+    }
+
+    fn knight_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
+      // Knight has eight possible moves, and he can jump over other figures
+      let mut new_x = 0;
+      let mut new_y = 0;
+      let mut moves = Vec::new();
+
+      if self.x < COLS - 2 && self.y < ROWS - 1 {
+        // We add this move to the list if the square is empty or contains a figure
+        // of the opponent
+        new_x = self.x + 2;
+        new_y = self.y + 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y))
+        }
+      }
+
+      if self.x < COLS - 2 && self.y > 0 {
+        new_x = self.x + 2;
+        new_y = self.y - 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x >= 2 && self.y < ROWS - 1 {
+        new_x = self.x - 2;
+        new_y = self.y + 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 1  && self.y > 0 {
+        new_x = self.x - 2;
+        new_y = self.y - 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x < COLS - 1 && self.y < ROWS - 2 {
+        new_x = self.x + 1;
+        new_y = self.y + 2;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x < COLS - 1 && self.y > 1 {
+        new_x = self.x + 1;
+        new_y = self.y - 2;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 0 && self.y < ROWS - 2 {
+        new_x = self.x - 1;
+        new_y = self.y + 2;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 0 && self.y > 1 {
+        new_x = self.x - 1;
+        new_y = self.y - 2;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      return moves
     }
 }
