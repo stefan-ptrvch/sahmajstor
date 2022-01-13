@@ -122,6 +122,7 @@ export default {
         console.error('Error:', error)
       })
     },
+
     updatePawn() {
       // Swap the pawn for a new figure
       this.pawnPromotion.square.figure = new this.Figure(

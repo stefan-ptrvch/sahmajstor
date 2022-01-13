@@ -117,7 +117,7 @@ impl Square {
             SquareContent::BISHOP => { return self.bishop_moves(&board_state) },
             SquareContent::ROOK => { return self.rook_moves(&board_state) },
             SquareContent::QUEEN => { return self.queen_moves(&board_state) },
-            SquareContent::KING => { return Vec::new() },
+            SquareContent::KING => { return self.king_moves(&board_state) },
             SquareContent::EMPTY =>  { return Vec::new() }
         }
     }
@@ -572,6 +572,121 @@ impl Square {
           break;
         }
       }
+
+      return moves
+    }
+
+    fn king_moves(&self, board_state: &[[Square; COLS]; ROWS]) -> Vec<(usize, usize)> {
+      // The king has eight normal moves and two castling moves
+      let mut new_x = self.x;
+      let mut new_y = self.y;
+      let mut moves = Vec::new();
+
+      if self.y < ROWS - 1 {
+        new_x = self.x;
+        new_y = self.y + 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.y > 0 {
+        new_x = self.x;
+        new_y = self.y - 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x < COLS - 1 {
+        new_x = self.x + 1;
+        new_y = self.y;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 0 {
+        new_x = self.x - 1;
+        new_y = self.y;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x < COLS - 1 && self.y < ROWS - 1 {
+        new_x = self.x + 1;
+        new_y = self.y + 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x < COLS - 1 && self.y > 0 {
+        new_x = self.x + 1;
+        new_y = self.y - 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 0 && self.y < ROWS - 1 {
+        new_x = self.x - 1;
+        new_y = self.y + 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      if self.x > 0 && self.y > 0 {
+        new_x = self.x - 1;
+        new_y = self.y - 1;
+        if board_state[new_y][new_x].content == SquareContent::EMPTY || board_state[new_y][new_x].belongs_to != self.belongs_to {
+          moves.push((new_x, new_y));
+        }
+      }
+
+      // Now we check for castling related moves
+      // if (player === 'white' && castlingWhiteLeft) {
+        // // Check if there are any figures blocking the way
+        // if (!board[7][2].figure && !board[7][3].figure) {
+
+          // // Check if any of the fields the king is moving over are under attack
+          // if (!isUnderAttack('black', [{y: 7, x: 2}, {y: 7, x: 3}], board)) {
+            // moves.push({x: 2, y: 7})
+          // }
+        // }
+      // }
+      // if (player === 'white' && castlingWhiteRight) {
+        // // Check if there are any figures blocking the way
+        // if (!board[7][5].figure && !board[7][6].figure) {
+
+          // // Check if any of the fields the king is moving over are under attack
+          // if (!isUnderAttack('black', [{y: 7, x: 5}, {y: 7, x: 6}], board)) {
+            // moves.push({x: 6, y: 7})
+          // }
+        // }
+      // }
+      // if (player === 'black' && castlingBlackLeft) {
+        // // Check if there are any figures blocking the way
+        // if (!board[0][2].figure && !board[0][3].figure) {
+
+          // // Check if any of the fields the king is moving over are under attack
+          // if (!isUnderAttack('white', [{y: 0, x: 2}, {y: 0, x: 3}], board)) {
+            // moves.push({x: 2, y: 0})
+          // }
+        // }
+      // }
+      // if (player === 'black' && castlingBlackRight) {
+        // // Check if there are any figures blocking the way
+        // if (!board[0][5].figure && !board[0][6].figure) {
+
+          // // Check if any of the fields the king is moving over are under attack
+          // if (!isUnderAttack('white', [{y: 0, x: 5}, {y: 0, x: 6}], board)) {
+            // moves.push({x: 6, y: 0})
+          // }
+        // }
+      // }
 
       return moves
     }
