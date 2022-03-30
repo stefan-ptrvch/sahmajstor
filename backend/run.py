@@ -1,11 +1,13 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, session
+from flask_cors import CORS, cross_origin
 import plakychess
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = 'b409cfe2f5bb8af9898ac423ca728840934c5f65feb0e979778159aed78b2b81'
+CORS(app, resources={r'/api/*': {'origins': 'http://localhost:8080'}})
 
 @app.route("/api", methods=["GET", "POST"])
+@cross_origin(supports_credentials=True)
 def api_handler():
     """
     Gets JSON representation of board state and generates next move.
